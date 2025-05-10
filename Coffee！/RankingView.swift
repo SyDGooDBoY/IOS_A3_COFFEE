@@ -1,8 +1,8 @@
 //
-//  RankingView.swift
+//  RootView.swift
 //  Coffee！
 //
-//  Created by Chelsea Wu💕 on 10/5/2025.
+//  Created by HF on 11/5/2025.
 //
 
 import SwiftUI
