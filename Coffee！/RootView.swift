@@ -33,7 +33,7 @@ struct RootView: View {
                 case .stats:   RankingView()
                 case .ranking: Text("Calendar Page")
                 case .map:     MapView()
-                case .add:     PostView()
+                case .add: NewPostView(selection: $selection)
                 case .profile: ProfileView()
                 }
             }
