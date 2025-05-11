@@ -14,38 +14,44 @@ class CalendarViewModel: ObservableObject {
     private let calendar = Calendar.current
     private let year = Calendar.current.component(.year, from: Date())
     
-    /// ["JAN", "FEB", ...]
+    ///["JAN", "FEB", ...]
     var months: [String] {
         calendar.shortMonthSymbols.map { $0.uppercased() }
     }
     
-    /// First Day
+    ///First Day
     private var firstOfMonth: Date {
         calendar.date(from: DateComponents(year: year, month: currentMonth + 1, day: 1))!
     }
     
-    /// Total Day
+    ///Total Day
     var daysCount: Int {
         calendar.range(of: .day, in: .month, for: firstOfMonth)!.count
     }
     
-    /// Date Match Day
+    ///Date Match Day
     private var weekdayOfFirst: Int {
         calendar.component(.weekday, from: firstOfMonth)
     }
     
-    /// Off-set of Calender
+    ///Off-set of Calender
     private var blankCount: Int {
         (weekdayOfFirst - calendar.firstWeekday + 7) % 7
     }
     
-    /// Make the Calender Array
+    ///Make the Calender Array
     var daysArray: [Int] {
         Array(repeating: 0, count: blankCount) + Array(1...daysCount)
     }
     
-    /// Provide Days
+    ///Provide Days
     var weekdaySymbols: [String] {
         calendar.veryShortWeekdaySymbols
+    }
+    
+    ///Return Date, Month, Year
+    func date(for day: Int) -> Date {
+        let comps = DateComponents(year: year, month: currentMonth + 1, day: day)
+        return calendar.date(from: comps)!
     }
 }
