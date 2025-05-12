@@ -31,7 +31,7 @@ struct RootView: View {
             Group {
                 switch selection {
                 case .stats:   RankingView()
-                case .ranking: Text("Calendar Page")
+                case .ranking: CalenderView()
                 case .map:     MapView()
                 case .add: NewPostView(selection: $selection)
                 case .profile: ProfileView()

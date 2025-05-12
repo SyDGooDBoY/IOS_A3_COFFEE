@@ -25,13 +25,13 @@ struct CalenderView: View {
             
             VStack {
                 Spacer()
-                    .frame(height: 20)
+                    .frame(height: 30)
                     .opacity(0)
                 
                 ///Title One
                 Text("CUP BY CUP")
                     .font(.title .bold())
-                    .foregroundColor(Color.black.opacity(0.7))
+                    .foregroundColor(Color("Font"))
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
                 ///Scrolling Month
@@ -61,21 +61,25 @@ struct CalenderView: View {
                    .cornerRadius(8)
                 
                 Spacer()
-                    .frame(height: 20)
+                    .frame(height: 30)
                     .opacity(0)
                 
                 //Days
                 HStack {
                     ForEach(vm.weekdaySymbols, id: \.self) { wd in
                         Text(wd)
-                            .font(.title3)
-                            .foregroundColor(Color.black.opacity(0.7))
+                            .font(.title3 .bold())
+                            .foregroundColor(Color("Font"))
                             .frame(maxWidth: .infinity)
                     }
                 }
                 
+                Spacer()
+                    .frame(height: 30)
+                    .opacity(0)
+                
                 ///Dates
-                LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 7), spacing: 12) {
+                LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 7), spacing: 30) {
                     ForEach(vm.daysArray, id: \.self) { day in
                         if day == 0 {
                             Text(" ")
@@ -103,14 +107,6 @@ struct CalenderView: View {
                 Spacer()
                     .frame(height: 40)
                     .opacity(0)
-                
-                ///Title Two
-                Text("LAST CUP")
-                    .font(.title .bold())
-                    .foregroundColor(Color.black.opacity(0.7))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                Spacer()
             }
             ///Avoid Logo Area
             .padding(.top, 80)
@@ -141,15 +137,78 @@ struct EntryDetailView: View {
             ZStack {
                 Color("Background")
                     .ignoresSafeArea()
+                
+                ScrollView {
+                    HStack {
+                        Text("\(day)")
+                            .font(.title2 .bold())
+                            .foregroundColor(.brown)
+                        
+                        Text("\(viewModel.months[month - 1])")
+                            .font(.title2 .bold())
+                            .foregroundColor(.brown)
+                        
+                        Text("2025")
+                            .font(.title2 .bold())
+                            .foregroundColor(.brown)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Spacer()
+                        .frame(height: 15)
+                        .opacity(0)
+                    
+                    HStack {
+                        Text("@")
+                            .font(.title3)
+                            .foregroundColor(Color("Font"))
+                        Text("Skittle Lane")
+                            .font(.title3)
+                            .foregroundColor(Color("Font"))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    HStack {
+                        Image("coldbrew1")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 250)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        Spacer()
+                            .frame(width: 15)
+                            .opacity(0)
+                        
+                        VStack(alignment: .leading) {
+                            Text("Cold Brew")
+                                .font(.callout .bold())
+                                .foregroundColor(Color("Font"))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .lineLimit(nil)
+                                .multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(8)
+                                 .background(
+                                     RoundedRectangle(cornerRadius: 10)
+                                         .fill(Color("Blue").opacity(0.3))
+                                 )
+                            
+                            Spacer()
+                                .frame(height: 15)
 
-                Form {
-                    Section(header: Text("Log for \(month)/\(day)")) {
-                        // ImagePicker、类型 Picker、TextField、评分控件…
+                            Text("4/5")
+                                .font(.callout .bold())
+                                .foregroundColor(Color("Font"))
+                                .padding(8)
+                                 .background(
+                                     RoundedRectangle(cornerRadius: 10)
+                                         .fill(Color("Orange").opacity(0.3))
+                                 )
+                        }
                     }
                 }
-                .scrollContentBackground(.hidden)
+                .padding(.horizontal, 20)
             }
-            .navigationTitle("Your Entry")
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
