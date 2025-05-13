@@ -11,9 +11,12 @@ import PhotosUI
 
 struct NewPostView: View {
     @Binding var selection: Tab
+    @EnvironmentObject var postStore: PostStore
 
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var selectedImage: UIImage? = nil
+    @State private var selectedImageName: String = ""
+
     @State private var location: String = ""
     @State private var postDate: Date = Date()
     @State private var caption: String = ""
@@ -42,9 +45,16 @@ struct NewPostView: View {
                     }
                     Spacer()
                     Button("Share") {
-                        print("Shared!")
+                        let newPost = CoffeePost(
+                            date: postDate,
+                            coffeeType: selectedCoffee,
+                            cafeName: location,
+                            photoFilename: selectedImageName,
+                            cafeRating: 5
+                        )
+                        postStore.addPost(newPost)
                         clearForm()
-                        selection = .stats
+                        selection = .allPosts // navigate to the post board
                     }
                     .disabled(!allFieldsFilled)
                 }
@@ -124,13 +134,14 @@ struct NewPostView: View {
                                         .cornerRadius(8)
                                         .onTapGesture {
                                             selectedImage = UIImage(named: name)
+                                            selectedImageName = name // <- track the selected image filename
                                         }
                                 }
                             }
                         }
                     }
                     .padding(.horizontal)
-                    .padding(.bottom, 120) // Ensure recent photos + tab bar are visible
+                    .padding(.bottom, 120)
                 }
             }
 
@@ -147,6 +158,7 @@ struct NewPostView: View {
                 if let data = try? await selectedItem.loadTransferable(type: Data.self),
                    let uiImage = UIImage(data: data) {
                     selectedImage = uiImage
+                    selectedImageName = "customImage" // fallback name if not from assets
                 }
             }
         }
@@ -154,6 +166,7 @@ struct NewPostView: View {
 
     private func clearForm() {
         selectedImage = nil
+        selectedImageName = ""
         location = ""
         caption = ""
         postDate = Date()

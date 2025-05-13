@@ -8,12 +8,12 @@
 import SwiftUI
 
 enum Tab: Int, CaseIterable {
-    case ranking, map, add, stats, profile
+    case ranking, allPosts, add, stats, profile
     
     var iconName: String {
         switch self {
         case .stats:   return "chart.bar"          // 1st icon
-        case .map:     return "slider.horizontal.3"// 2nd icon
+        case .allPosts:     return "slider.horizontal.3"// 2nd icon
         case .add:     return "plus"               // Plus icon
         case .ranking: return "calendar"           // 4th icon
         case .profile: return "person.fill"        // 5th icon
@@ -32,7 +32,7 @@ struct RootView: View {
                 switch selection {
                 case .stats:   RankingView()
                 case .ranking: CalenderView()
-                case .map:     MapView()
+                case .allPosts:     AllPostsView()
                 case .add: NewPostView(selection: $selection)
                 case .profile: ProfileView()
                 }
