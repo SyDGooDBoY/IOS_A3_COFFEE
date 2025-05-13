@@ -21,6 +21,7 @@ struct NewPostView: View {
     @State private var postDate: Date = Date()
     @State private var caption: String = ""
     @State private var selectedCoffee: String = "Flat white"
+    @State private var rating: Int = 3
 
     let recentImageNames = [
         "espresso1", "espresso2",
@@ -38,7 +39,7 @@ struct NewPostView: View {
     var body: some View {
         ZStack(alignment: .top) {
             VStack(spacing: 0) {
-                // Top bar with Cancel and Share
+                // Top bar
                 HStack {
                     Button("Cancel") {
                         selection = .stats
@@ -50,20 +51,21 @@ struct NewPostView: View {
                             coffeeType: selectedCoffee,
                             cafeName: location,
                             photoFilename: selectedImageName,
-                            cafeRating: 5
+                            cafeRating: rating
                         )
                         postStore.addPost(newPost)
                         clearForm()
-                        selection = .allPosts // navigate to the post board
+                        selection = .allPosts
                     }
                     .disabled(!allFieldsFilled)
                 }
                 .padding(.horizontal)
                 .padding(.top, 10)
 
-                // Scroll content
+                // ScrollView form
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
+
                         // Image Picker
                         PhotosPicker(selection: $selectedItem, matching: .images) {
                             if let image = selectedImage {
@@ -109,13 +111,29 @@ struct NewPostView: View {
                             .background(Color(UIColor.systemGray6))
                             .cornerRadius(8)
 
-                        // Coffee Type Dropdown
-                        Picker("Coffee Type", selection: $selectedCoffee) {
-                            ForEach(coffeeTypes, id: \.self) { type in
-                                Text(type)
+                        // Coffee Type + Rating
+                        HStack(spacing: 16) {
+                            Picker("Coffee Type", selection: $selectedCoffee) {
+                                ForEach(coffeeTypes, id: \.self) { type in
+                                    Text(type)
+                                }
+                            }
+                            .pickerStyle(MenuPickerStyle())
+
+                            Spacer()
+
+                            HStack(spacing: 4) {
+                                ForEach(1...5, id: \.self) { star in
+                                    Image(systemName: star <= rating ? "star.fill" : "star")
+                                        .resizable()
+                                        .frame(width: 18, height: 18)
+                                        .foregroundColor(.orange)
+                                        .onTapGesture {
+                                            rating = star
+                                        }
+                                }
                             }
                         }
-                        .pickerStyle(MenuPickerStyle())
                         .padding()
                         .background(Color(UIColor.systemGray6))
                         .cornerRadius(8)
@@ -134,7 +152,7 @@ struct NewPostView: View {
                                         .cornerRadius(8)
                                         .onTapGesture {
                                             selectedImage = UIImage(named: name)
-                                            selectedImageName = name // <- track the selected image filename
+                                            selectedImageName = name
                                         }
                                 }
                             }
@@ -145,7 +163,7 @@ struct NewPostView: View {
                 }
             }
 
-            // Custom tab bar
+            // Tab bar
             VStack {
                 Spacer()
                 CustomTabBar(selection: $selection)
@@ -158,7 +176,7 @@ struct NewPostView: View {
                 if let data = try? await selectedItem.loadTransferable(type: Data.self),
                    let uiImage = UIImage(data: data) {
                     selectedImage = uiImage
-                    selectedImageName = "customImage" // fallback name if not from assets
+                    selectedImageName = "customImage"
                 }
             }
         }
@@ -171,5 +189,6 @@ struct NewPostView: View {
         caption = ""
         postDate = Date()
         selectedCoffee = "Flat white"
+        rating = 3
     }
 }
