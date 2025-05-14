@@ -5,6 +5,8 @@
 //  Created by AJ on 14/5/2025.
 //
 
+// LoginView.swift
+
 import SwiftUI
 
 struct LoginView: View {
@@ -58,6 +60,7 @@ struct LoginView: View {
 
                 Button("Login") {
                     if db.users[email]?.password == password {
+                        db.currentUserEmail = email
                         isLoggedIn = true
                     } else {
                         loginFailed = true
