@@ -6,76 +6,51 @@
 //
 
 import SwiftUI
-import MapKit
 
+/// 店铺详情页（仅店名 + 随机帖子）
 struct RankingShopView: View {
     let shop: CoffeeShop
     
     @EnvironmentObject var postStore: PostStore
-    @Environment(\.openURL) private var openURL
-        
-    // map
-    @State private var region: MKCoordinateRegion
     
-    init(shop: CoffeeShop) {
-        self.shop = shop
-        
-        _region = State(initialValue: MKCoordinateRegion(
-                   center: .init(latitude: shop.latitude, longitude: shop.longitude),
-                   span: .init(latitudeDelta: 0.005, longitudeDelta: 0.005)
-               ))
+    /// 只显示当前店铺的帖子
+    private var postsForShop: [CoffeePost] {
+        postStore.posts.filter {
+            $0.cafeName.compare(shop.name, options: .caseInsensitive) == .orderedSame
+        }
     }
+
     
     var body: some View {
         ScrollView {
-            // name and map
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 0) {
-                        // seprate name with space
-                        ForEach(shop.name.split(separator: " "), id: \.self) { part in
-                            Text(part.lowercased())          // “coffee” / “shop”
-                                .font(.largeTitle.bold())
-                        }
-                        Text("\(shop.rank)")                 // “1”
-                            .font(.largeTitle.bold())
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                Map(coordinateRegion: $region, interactionModes: [])
-                    .frame(width: 150, height: 150)
-                    .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.4), lineWidth: 1)
-                    )
-                    .onTapGesture {
-                        let url = URL(string:
-                            "http://maps.apple.com/?daddr=\(shop.latitude),\(shop.longitude)")!
-                        openURL(url)
-                    }
+            // 顶部：店名三行显示
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(shop.name.split(separator: " "), id: \.self) { part in
+                    Text(part.lowercased())
+                        .font(.largeTitle.bold())
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
             
-            let randomPosts = Array(postStore.posts.shuffled().prefix(10))
-                        
-                        LazyVGrid(columns: [.init(.flexible(), spacing: 16),
-                                            .init(.flexible(), spacing: 16)],
-                                  spacing: 24) {
-                            ForEach(randomPosts) { post in
-                                PostCard(post: post)
-                            }
-                        }
+            LazyVGrid(columns: [.init(.flexible(), spacing: 16),
+                                .init(.flexible(), spacing: 16)],
+                      spacing: 24) {
+                ForEach(postsForShop) { post in          // ← 修改这里
+                    PostCard(post: post)
+                }
+            }
+
             .padding(.horizontal)
-            .padding(.bottom, 120)
+            .padding(.bottom, 120) // 预留底栏
         }
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
-// POST
+// MARK: - Post 卡片
 private struct PostCard: View {
     let post: CoffeePost
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Image(post.photoFilename)
@@ -84,29 +59,24 @@ private struct PostCard: View {
                 .frame(height: 150)
                 .clipped()
                 .cornerRadius(8)
-            
-            Text(post.cafeName)
-                .font(.headline)
-            
-            Text("☕️ \(post.coffeeType)") 
+            Text(post.cafeName).font(.headline)
+            Text("☕️ \(post.coffeeType)")
                 .font(.footnote)
                 .foregroundColor(.secondary)
-            
             HStack(spacing: 6) {
-                Image(systemName: "star.fill")
-                    .foregroundColor(.orange)
+                Image(systemName: "star.fill").foregroundColor(.orange)
                 Text("\(post.cafeRating)")
                 Spacer()
-                Text(formattedDate(post.date))
+                Text(dateString(post.date))
                     .font(.caption)
                     .foregroundColor(.gray)
             }
         }
     }
     
-    private func formattedDate(_ date: Date) -> String {
+    private func dateString(_ d: Date) -> String {
         let f = DateFormatter()
         f.dateStyle = .medium
-        return f.string(from: date)
+        return f.string(from: d)
     }
 }

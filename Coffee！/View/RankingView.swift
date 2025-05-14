@@ -4,36 +4,44 @@
 //
 //  Created by HF on 11/5/2025.
 //
-
 import SwiftUI
 
-
+// MARK: - Café 列表模型（已无 distance）
 struct CoffeeShop: Identifiable {
     let id = UUID()
     let rank: Int
     let name: String
     let rating: Int
-    let distance: Double
-    let latitude: Double
-    let longitude: Double
 }
 
-// main page
+// MARK: - 排行榜
 struct RankingView: View {
-    @State private var currentLocation = ""
     @StateObject private var locationManager = LocationManager()
-
-    // fake data for now
-    private let shops: [CoffeeShop] = [
-        .init(rank: 1, name: "Coffee shop1", rating: 4, distance: 0.5,
-              latitude: -33.8830, longitude: 151.2000),
-        .init(rank: 2, name: "Coffee shop2", rating: 5, distance: 0.8,
-              latitude: -33.8815, longitude: 151.1990),
-        .init(rank: 3, name: "Coffee shop3", rating: 4, distance: 1.2,
-              latitude: -33.8800, longitude: 151.1980),
-        .init(rank: 4, name: "Coffee shop4", rating: 3, distance: 1.5,
-              latitude: -33.8820, longitude: 151.1970)
-    ]
+    @EnvironmentObject private var postStore: PostStore
+    
+    /// 根据帖子动态生成并排序后的店铺
+    private var shops: [CoffeeShop] {
+        let groups = Dictionary(grouping: postStore.posts) { $0.cafeName }
+        
+        var cafes: [CoffeeShop] = groups.map { name, posts in
+            let avg = Int(round(Double(posts.map(\.cafeRating).reduce(0, +)) /
+                                Double(posts.count)))
+            return CoffeeShop(rank: 0, name: name, rating: avg)
+        }
+        
+        cafes.sort {
+            $0.rating == $1.rating
+            ? $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+            : $0.rating > $1.rating
+        }
+        
+        for i in cafes.indices {
+            cafes[i] = CoffeeShop(rank: i + 1,
+                                  name: cafes[i].name,
+                                  rating: cafes[i].rating)
+        }
+        return cafes
+    }
     
     var body: some View {
         NavigationStack {
@@ -48,36 +56,18 @@ struct RankingView: View {
                 }
                 .padding(.horizontal)
                 
-                // current location text field(need to change to auto locate)
-                HStack {Image(systemName: "location.fill")
-                        .foregroundColor(.gray)
-                    Text(locationManager.locationString)
-                                      .font(.subheadline)
-                                      .lineLimit(1)
-                                      .truncationMode(.tail)
-                                  Spacer()
-                              }
-                              .padding(.vertical, 8)
-                              .padding(.horizontal, 12)
-                              .background(Color(UIColor.systemGray6))
-                              .cornerRadius(6)
-                              .overlay(
-                                  RoundedRectangle(cornerRadius: 6)
-                                      .stroke(Color.gray.opacity(0.4), lineWidth: 1)
-                              )
-                              .padding(.horizontal)
                 
-                // ranking list
+                // 排名列表
                 ScrollView {
                     VStack(spacing: 12) {
                         ForEach(shops) { shop in
-                                    NavigationLink {
-                                        RankingShopView(shop: shop)
-                                    } label: {
-                                        ShopCard(shop: shop)
-                                    }
-                                    .buttonStyle(.plain)      
-                                }
+                            NavigationLink {
+                                RankingShopView(shop: shop)
+                            } label: {
+                                ShopCard(shop: shop)
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
                     .padding(.horizontal)
                 }
@@ -87,36 +77,30 @@ struct RankingView: View {
     }
 }
 
-// tab
 struct ShopCard: View {
     let shop: CoffeeShop
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            // rank
+            // 排名
             Text("\(shop.rank)")
                 .font(.system(size: 32, weight: .bold))
                 .frame(width: 40, alignment: .leading)
             
             VStack(alignment: .leading, spacing: 4) {
-                // name
+                // 店名
                 Text(shop.name)
                     .font(.headline)
                 
-                // star
-                HStack(spacing: 2) {
-                    ForEach(0..<5) { index in
-                        Image(systemName: index < shop.rating ? "star.fill" : "star")
-                            .font(.subheadline)
-                    }
-                }
-                .foregroundColor(Color("StarGold", bundle: nil) ?? .yellow)
+                // ⭐️ 星级
+                Text(String(repeating: "⭐️", count: shop.rating))
+                    .font(.subheadline)
                 
-                // icon
+                // 三个功能图标
                 HStack(spacing: 8) {
-                    Image(systemName: "figure.roll")       // accessibility
-                    Image(systemName: "wifi")              // Wi-Fi
-                    Image(systemName: "house")             // toliet(using house for now)
+                    Image(systemName: "figure.roll")   // 无障碍
+                    Image(systemName: "wifi")          // Wi-Fi
+                    Image(systemName: "house")         // 洗手间（占位）
                 }
                 .font(.subheadline)
                 .foregroundStyle(.gray)
@@ -124,17 +108,19 @@ struct ShopCard: View {
             
             Spacer()
             
-            // distance
-            Text(String(format: "%.1fKM", shop.distance))
-                .font(.subheadline.weight(.semibold))
+            // ➔ 右箭头
+            Image(systemName: "chevron.right")
+                .font(.headline)
                 .foregroundColor(.gray)
         }
         .padding()
         .background(Color(UIColor.systemGray5))
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 
+
+
 #Preview {
-    RankingView()
+    RankingView().environmentObject(PostStore())
 }
