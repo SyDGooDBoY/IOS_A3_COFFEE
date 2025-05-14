@@ -50,4 +50,7 @@ struct RootView: View {
     }
 }
 
-#Preview { RootView() }
+#Preview {
+    RootView()
+        .environmentObject(PostStore())
+}
