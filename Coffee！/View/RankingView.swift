@@ -14,18 +14,25 @@ struct CoffeeShop: Identifiable {
     let name: String
     let rating: Int
     let distance: Double
+    let latitude: Double
+    let longitude: Double
 }
 
 // main page
 struct RankingView: View {
     @State private var currentLocation = ""
-    
+    @StateObject private var locationManager = LocationManager()
+
     // fake data for now
     private let shops: [CoffeeShop] = [
-        .init(rank: 1, name: "Coffee shop", rating: 4, distance: 0.5),
-        .init(rank: 2, name: "Brew Bros",    rating: 5, distance: 0.8),
-        .init(rank: 3, name: "Latte Land",   rating: 4, distance: 1.2),
-        .init(rank: 4, name: "Roast & Roll", rating: 3, distance: 1.5)
+        .init(rank: 1, name: "Coffee shop1", rating: 4, distance: 0.5,
+              latitude: -33.8830, longitude: 151.2000),
+        .init(rank: 2, name: "Coffee shop2", rating: 5, distance: 0.8,
+              latitude: -33.8815, longitude: 151.1990),
+        .init(rank: 3, name: "Coffee shop3", rating: 4, distance: 1.2,
+              latitude: -33.8800, longitude: 151.1980),
+        .init(rank: 4, name: "Coffee shop4", rating: 3, distance: 1.5,
+              latitude: -33.8820, longitude: 151.1970)
     ]
     
     var body: some View {
@@ -33,7 +40,7 @@ struct RankingView: View {
             VStack(spacing: 16) {
                 // Logo
                 HStack {
-                    Image("coffeeBondLogo")
+                    Image("Logo")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 90)
@@ -42,21 +49,35 @@ struct RankingView: View {
                 .padding(.horizontal)
                 
                 // current location text field(need to change to auto locate)
-                TextField("Current location…", text: $currentLocation)
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, 12)
-                    .background(Color(UIColor.systemGray6))
-                    .cornerRadius(6)
-                    .overlay(RoundedRectangle(cornerRadius: 6)
-                                .stroke(Color.gray.opacity(0.4), lineWidth: 1))
-                    .padding(.horizontal)
+                HStack {Image(systemName: "location.fill")
+                        .foregroundColor(.gray)
+                    Text(locationManager.locationString)
+                                      .font(.subheadline)
+                                      .lineLimit(1)
+                                      .truncationMode(.tail)
+                                  Spacer()
+                              }
+                              .padding(.vertical, 8)
+                              .padding(.horizontal, 12)
+                              .background(Color(UIColor.systemGray6))
+                              .cornerRadius(6)
+                              .overlay(
+                                  RoundedRectangle(cornerRadius: 6)
+                                      .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                              )
+                              .padding(.horizontal)
                 
                 // ranking list
                 ScrollView {
                     VStack(spacing: 12) {
                         ForEach(shops) { shop in
-                            ShopCard(shop: shop)
-                        }
+                                    NavigationLink {
+                                        RankingShopView(shop: shop)
+                                    } label: {
+                                        ShopCard(shop: shop)
+                                    }
+                                    .buttonStyle(.plain)      
+                                }
                     }
                     .padding(.horizontal)
                 }

@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct CalenderView: View {
+    @EnvironmentObject var postStore: PostStore
     @StateObject private var vm = CalendarViewModel()
     
-    @State private var selectedDay: Int? = nil
-    @State private var isShowingEntry = false
+    @State private var selectedDay: DaySelection? = nil
     
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -85,20 +85,25 @@ struct CalenderView: View {
                             Text(" ")
                                 .frame(maxWidth: .infinity)
                         } else {
+                            let isToday = vm.isToday(day: day)
+                            let hasPost = vm.hasPost(on: postStore.posts, day: day)
+
                             Text("\(day)")
                                 .frame(maxWidth: .infinity)
                                 .padding(8)
+                                .fontWeight(isToday ? .bold : .regular)
+                                .foregroundColor(isToday ? .brown : Color("Font"))
+                                .font(isToday ? .title3 : .callout)
                                 .background(
-                                    day == Calendar.current.component(.day, from: Date()) &&
-                                    vm.currentMonth == Calendar.current.component(.month, from: Date()) - 1
-                                    ? Color.brown.opacity(0.3)
-                                    : Color.clear
+                                    Circle()
+                                        .fill(hasPost
+                                            ? Color("Green").opacity(0.3)
+                                            : Color.clear
+                                        )
                                 )
                                 .cornerRadius(4)
-                                ///Click on date
                                 .onTapGesture {
-                                    selectedDay = day
-                                    isShowingEntry = true
+                                    selectedDay = DaySelection(day: day)
                                 }
                         }
                     }
@@ -112,117 +117,21 @@ struct CalenderView: View {
             .padding(.top, 80)
             .padding(.horizontal, 20)
         }
-        .sheet(isPresented: $isShowingEntry) {
-            if let day = selectedDay {
-                EntryDetailView(
-                    day: day,
+        .sheet(item: $selectedDay) { selection in
+                CalenderPopUpView(
+                    day: selection.day,
                     month: vm.currentMonth + 1,
                     viewModel: vm
                 )
                 .presentationDetents([.fraction(0.8)])
                 .presentationDragIndicator(.visible)
+                .environmentObject(postStore)
             }
-        }
     }
 }
 
-struct EntryDetailView: View {
-    let day: Int
-    let month: Int
-    @ObservedObject var viewModel: CalendarViewModel
-    @Environment(\.dismiss) private var dismiss
-    
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                Color("Background")
-                    .ignoresSafeArea()
-                
-                ScrollView {
-                    HStack {
-                        Text("\(day)")
-                            .font(.title2 .bold())
-                            .foregroundColor(.brown)
-                        
-                        Text("\(viewModel.months[month - 1])")
-                            .font(.title2 .bold())
-                            .foregroundColor(.brown)
-                        
-                        Text("2025")
-                            .font(.title2 .bold())
-                            .foregroundColor(.brown)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    Spacer()
-                        .frame(height: 15)
-                        .opacity(0)
-                    
-                    HStack {
-                        Text("@")
-                            .font(.title3)
-                            .foregroundColor(Color("Font"))
-                        Text("Skittle Lane")
-                            .font(.title3)
-                            .foregroundColor(Color("Font"))
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    HStack {
-                        Image("coldbrew1")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 250)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        
-                        Spacer()
-                            .frame(width: 15)
-                            .opacity(0)
-                        
-                        VStack(alignment: .leading) {
-                            Text("Cold Brew")
-                                .font(.callout .bold())
-                                .foregroundColor(Color("Font"))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .lineLimit(nil)
-                                .multilineTextAlignment(.leading)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .padding(8)
-                                 .background(
-                                     RoundedRectangle(cornerRadius: 10)
-                                         .fill(Color("Blue").opacity(0.3))
-                                 )
-                            
-                            Spacer()
-                                .frame(height: 15)
-
-                            Text("4/5")
-                                .font(.callout .bold())
-                                .foregroundColor(Color("Font"))
-                                .padding(8)
-                                 .background(
-                                     RoundedRectangle(cornerRadius: 10)
-                                         .fill(Color("Orange").opacity(0.3))
-                                 )
-                        }
-                    }
-                }
-                .padding(.horizontal, 20)
-            }
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .foregroundColor(.brown)
-                    }
-                }
-            }
-        }
-    }
-}
 
 #Preview {
     CalenderView()
+        .environmentObject(PostStore())
 }

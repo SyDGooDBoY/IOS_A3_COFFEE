@@ -50,8 +50,33 @@ class CalendarViewModel: ObservableObject {
     }
     
     ///Return Date, Month, Year
+//    func date(for day: Int) -> Date {
+//        let comps = DateComponents(year: year, month: currentMonth + 1, day: day)
+//        return calendar.date(from: comps)!
+//    }
     func date(for day: Int) -> Date {
-        let comps = DateComponents(year: year, month: currentMonth + 1, day: day)
+        let comps = DateComponents(
+            year: Calendar.current.component(.year, from: Date()),
+            month: currentMonth + 1,
+            day: day
+        )
         return calendar.date(from: comps)!
+    }
+    
+    ///Check is this date is today
+    func isToday(day: Int) -> Bool {
+        calendar.isDate(date(for: day), inSameDayAs: Date())
+    }
+
+    ///Check is this day has post
+    func hasPost(on posts: [CoffeePost], day: Int) -> Bool {
+        let d = date(for: day)
+        return posts.contains { calendar.isDate($0.date, inSameDayAs: d) }
+    }
+    
+    ///Display the posts in selected day
+    func postsForDay(_ day: Int, in posts: [CoffeePost]) -> [CoffeePost] {
+        let target = date(for: day)
+        return posts.filter { calendar.isDate($0.date, inSameDayAs: target) }
     }
 }

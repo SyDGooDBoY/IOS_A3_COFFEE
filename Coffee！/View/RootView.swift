@@ -13,7 +13,7 @@ enum Tab: Int, CaseIterable {
     var iconName: String {
         switch self {
         case .stats:   return "chart.bar"          // 1st icon
-        case .allPosts:     return "slider.horizontal.3"// 2nd icon
+        case .allPosts:     return "books.vertical"// 2nd icon
         case .add:     return "plus"               // Plus icon
         case .ranking: return "calendar"           // 4th icon
         case .profile: return "person.fill"        // 5th icon
@@ -50,4 +50,7 @@ struct RootView: View {
     }
 }
 
-#Preview { RootView() }
+#Preview {
+    RootView()
+        .environmentObject(PostStore())
+}
