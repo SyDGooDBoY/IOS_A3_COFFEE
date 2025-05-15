@@ -2,6 +2,8 @@ import SwiftUI
 
 struct SignupView: View {
     @Binding var showingSignup: Bool
+    @Binding var isLoggedIn: Bool
+
     @State private var firstName = ""
     @State private var lastName = ""
     @State private var email = ""
@@ -10,7 +12,6 @@ struct SignupView: View {
     @State private var dateOfBirth = ""
     @State private var age = ""
 
-    
     @State private var signupFailed = false
     @State private var errorMessage = ""
 
@@ -51,7 +52,6 @@ struct SignupView: View {
             Button("Sign Up") {
                 if email.isEmpty || password.isEmpty || confirmPassword.isEmpty ||
                     firstName.isEmpty || lastName.isEmpty || dateOfBirth.isEmpty || age.isEmpty {
-                    
                     signupFailed = true
                     errorMessage = "Please fill all fields"
                 } else if password != confirmPassword {
@@ -69,6 +69,7 @@ struct SignupView: View {
                         age: age
                     )
                     db.currentUserEmail = email
+                    isLoggedIn = true
                     showingSignup = false
                 }
             }

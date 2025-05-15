@@ -5,24 +5,20 @@
 //  Created by AJ on 14/5/2025.
 //
 
-// LoginView.swift
-
 import SwiftUI
 
 struct LoginView: View {
+    @Binding var isLoggedIn: Bool
     @State private var email = ""
     @State private var password = ""
     @State private var loginFailed = false
-    @State private var isLoggedIn = false
     @State private var showingSignup = false
 
     @EnvironmentObject var db: LoginDatabase
 
     var body: some View {
-        if isLoggedIn {
-            RootView()
-        } else if showingSignup {
-            SignupView(showingSignup: $showingSignup)
+        if showingSignup {
+            SignupView(showingSignup: $showingSignup, isLoggedIn: $isLoggedIn)
                 .environmentObject(db)
         } else {
             VStack(spacing: 24) {

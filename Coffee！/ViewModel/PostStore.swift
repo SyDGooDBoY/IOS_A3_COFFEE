@@ -6,4 +6,8 @@ class PostStore: ObservableObject {
     func addPost(_ post: CoffeePost) {
         posts.insert(post, at: 0) // newest first
     }
+    
+    func reset() {
+            posts.removeAll()
+        }
 }

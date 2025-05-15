@@ -4,16 +4,16 @@ import SwiftUI
 struct Coffee_App: App {
     @StateObject private var db = LoginDatabase()
     @StateObject private var postStore = PostStore()
-    @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
+    @State private var isLoggedIn = false 
 
     var body: some Scene {
         WindowGroup {
             if isLoggedIn {
-                RootView()
+                RootView(isLoggedIn: $isLoggedIn)
                     .environmentObject(db)
                     .environmentObject(postStore)
             } else {
-                LoginView()
+                LoginView(isLoggedIn: $isLoggedIn)
                     .environmentObject(db)
                     .environmentObject(postStore)
             }

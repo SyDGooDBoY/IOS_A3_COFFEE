@@ -8,9 +8,12 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var isLoggedIn = true
+
     var body: some View {
-//        RankingView()
-        RootView()//using this as main view to swap views
+        RootView(isLoggedIn: $isLoggedIn)
+            .environmentObject(LoginDatabase()) 
+            .environmentObject(PostStore())
     }
 }
 

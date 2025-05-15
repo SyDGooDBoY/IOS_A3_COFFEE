@@ -2,7 +2,8 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var db: LoginDatabase
-    @AppStorage("isLoggedIn") var isLoggedIn: Bool = true
+    @EnvironmentObject var postStore: PostStore
+    @Binding var isLoggedIn: Bool
 
     var body: some View {
         NavigationStack {
@@ -17,6 +18,21 @@ struct ProfileView: View {
                         Text("Email: \(email)")
                         Text("Date of Birth: \(user.dateOfBirth)")
                         Text("Age: \(user.age)")
+
+                        // Log Out Button
+                        Button(action: {
+                            db.currentUserEmail = nil
+                            isLoggedIn = false
+                            postStore.reset() // Clear calendar data
+                        }) {
+                            Text("Log Out")
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.red)
+                                .cornerRadius(8)
+                        }
+                        .padding(.top, 10)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
@@ -26,19 +42,6 @@ struct ProfileView: View {
                 }
 
                 Spacer()
-
-                Button(action: {
-                    db.currentUserEmail = nil
-                    isLoggedIn = false // This triggers the switch to LoginView
-                }) {
-                    Text("Log Out")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.red.opacity(0.8))
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                        .padding(.horizontal)
-                }
             }
             .padding(.top)
             .navigationTitle("Profile")
