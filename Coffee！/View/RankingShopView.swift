@@ -7,13 +7,11 @@
 
 import SwiftUI
 
-/// 店铺详情页（仅店名 + 随机帖子）
 struct RankingShopView: View {
     let shop: CoffeeShop
     
     @EnvironmentObject var postStore: PostStore
     
-    /// 只显示当前店铺的帖子
     private var postsForShop: [CoffeePost] {
         postStore.posts.filter {
             $0.cafeName.compare(shop.name, options: .caseInsensitive) == .orderedSame
@@ -23,12 +21,10 @@ struct RankingShopView: View {
     
     var body: some View {
         ScrollView {
-            // 顶部：店名三行显示
             VStack(alignment: .leading, spacing: 0) {
-                ForEach(shop.name.split(separator: " "), id: \.self) { part in
-                    Text(part.lowercased())
+                Text(shop.name)
                         .font(.largeTitle.bold())
-                }
+                
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
@@ -36,19 +32,19 @@ struct RankingShopView: View {
             LazyVGrid(columns: [.init(.flexible(), spacing: 16),
                                 .init(.flexible(), spacing: 16)],
                       spacing: 24) {
-                ForEach(postsForShop) { post in          // ← 修改这里
+                ForEach(postsForShop) { post in
                     PostCard(post: post)
                 }
             }
 
             .padding(.horizontal)
-            .padding(.bottom, 120) // 预留底栏
+            .padding(.bottom, 120)
         }
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
-// MARK: - Post 卡片
+// MARK: - Post
 private struct PostCard: View {
     let post: CoffeePost
     var body: some View {

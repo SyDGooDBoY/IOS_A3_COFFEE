@@ -6,7 +6,6 @@
 //
 import SwiftUI
 
-// MARK: - Café 列表模型（已无 distance）
 struct CoffeeShop: Identifiable {
     let id = UUID()
     let rank: Int
@@ -14,12 +13,11 @@ struct CoffeeShop: Identifiable {
     let rating: Int
 }
 
-// MARK: - 排行榜
+// MARK: - Ranking
 struct RankingView: View {
     @StateObject private var locationManager = LocationManager()
     @EnvironmentObject private var postStore: PostStore
     
-    /// 根据帖子动态生成并排序后的店铺
     private var shops: [CoffeeShop] {
         let groups = Dictionary(grouping: postStore.posts) { $0.cafeName }
         
@@ -57,7 +55,7 @@ struct RankingView: View {
                 .padding(.horizontal)
                 
                 
-                // 排名列表
+                // List
                 ScrollView {
                     VStack(spacing: 12) {
                         ForEach(shops) { shop in
@@ -82,21 +80,20 @@ struct ShopCard: View {
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            // 排名
+            
             Text("\(shop.rank)")
                 .font(.system(size: 32, weight: .bold))
                 .frame(width: 40, alignment: .leading)
             
             VStack(alignment: .leading, spacing: 4) {
-                // 店名
+                
                 Text(shop.name)
                     .font(.headline)
                 
-                // ⭐️ 星级
+                
                 Text(String(repeating: "⭐️", count: shop.rating))
                     .font(.subheadline)
                 
-                // 三个功能图标
                 HStack(spacing: 8) {
                     Image(systemName: "figure.roll")   // 无障碍
                     Image(systemName: "wifi")          // Wi-Fi
@@ -108,7 +105,6 @@ struct ShopCard: View {
             
             Spacer()
             
-            // ➔ 右箭头
             Image(systemName: "chevron.right")
                 .font(.headline)
                 .foregroundColor(.gray)
