@@ -109,15 +109,6 @@ struct CalenderPopUpView: View {
     }
 }
 
-//#Preview {
-//    CalenderPopUpView(
-//        day: 14,
-//        month: 5,
-//        viewModel: CalendarViewModel()
-//    )
-//    .environmentObject(PostStore())
-//}
-
 #Preview {
     ///Sample Post for Preview
     let vm = CalendarViewModel()

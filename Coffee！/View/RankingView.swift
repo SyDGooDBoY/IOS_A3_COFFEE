@@ -13,7 +13,7 @@ struct CoffeeShop: Identifiable {
     let rating: Int
 }
 
-// MARK: - Ranking
+///Ranking Review
 struct RankingView: View {
     @StateObject private var locationManager = LocationManager()
     @EnvironmentObject private var postStore: PostStore
@@ -43,34 +43,44 @@ struct RankingView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 16) {
-                // Logo
-                HStack {
-                    Image("Logo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 90)
-                    Spacer()
-                }
-                .padding(.horizontal)
+            ZStack {
+                Color("Background")
+                    .ignoresSafeArea()
                 
-                
-                // List
-                ScrollView {
-                    VStack(spacing: 12) {
-                        ForEach(shops) { shop in
-                            NavigationLink {
-                                RankingShopView(shop: shop)
-                            } label: {
-                                ShopCard(shop: shop)
-                            }
-                            .buttonStyle(.plain)
-                        }
+                VStack(spacing: 16) {
+                    // Logo
+                    HStack {
+                        Image("Logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 90)
+                        Spacer()
                     }
                     .padding(.horizontal)
+                    
+                    
+                    // List
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            Text("Ranking")
+                                .font(.title .bold())
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.leading)
+                            
+                            ForEach(shops) { shop in
+                                NavigationLink {
+                                    RankingShopView(shop: shop)
+                                } label: {
+                                    ShopCard(shop: shop)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
                 }
+                .navigationBarHidden(true)
             }
-            .navigationBarHidden(true)
         }
     }
 }
@@ -95,9 +105,9 @@ struct ShopCard: View {
                     .font(.subheadline)
                 
                 HStack(spacing: 8) {
-                    Image(systemName: "figure.roll")   // 无障碍
-                    Image(systemName: "wifi")          // Wi-Fi
-                    Image(systemName: "house")         // 洗手间（占位）
+                    Image(systemName: "figure.roll")
+                    Image(systemName: "wifi")
+                    Image(systemName: "house")
                 }
                 .font(.subheadline)
                 .foregroundStyle(.gray)

@@ -44,7 +44,7 @@ struct RankingShopView: View {
     }
 }
 
-// MARK: - Post
+///Post
 private struct PostCard: View {
     let post: CoffeePost
     var body: some View {
